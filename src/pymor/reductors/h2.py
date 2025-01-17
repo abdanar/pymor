@@ -201,9 +201,8 @@ class IRKAReductor(GenericIRKAReductor):
         assert isinstance(fom, LTIModel)
         super().__init__(fom, mu=mu)
 
-    def reduce(self, rom0_params, tol=1e-4, maxit=100, num_prev=1,
-               force_sigma_in_rhp=False, projection='orth', conv_crit='sigma',
-               compute_errors=False):
+    def reduce(self, rom0_params, training_set = training_set, Vord = Vord, Word = Word, tol=1e-4, 
+               maxit=100, num_prev=1, force_sigma_in_rhp=False, projection='orth', conv_crit='sigma', compute_errors=False):
         r"""Reduce using IRKA.
 
         See :cite:`GAB08` (Algorithm 4.1) and :cite:`ABG10` (Algorithm 1).
@@ -271,8 +270,8 @@ class IRKAReductor(GenericIRKAReductor):
         sigma, b, c = self._rom0_params_to_sigma_b_c(rom0_params, force_sigma_in_rhp)
         self._store_sigma_b_c(sigma, b, c)
         self._check_common_args(tol, maxit, num_prev, conv_crit)
-        assert projection in ('orth', 'biorth', 'arnoldi')
-        if projection == 'arnoldi':
+        assert projection in ('orth', 'biorth', 'arnoldi', 'pod')
+        if projection == 'arnoldi' or 'pod':
             assert self.fom.dim_input == self.fom.dim_output == 1
 
         self.logger.info('Starting IRKA')
@@ -281,7 +280,10 @@ class IRKAReductor(GenericIRKAReductor):
             self._conv_data[0] = sigma
         self._pg_reductor = LTIBHIReductor(self.fom, mu=self.mu)
         for it in range(maxit):
-            rom = self._pg_reductor.reduce(sigma, b, c, projection=projection)
+            if projection == 'pod':
+                rom = self._pg_reductor.reduce(sigma, b, c, projection=projection, training_set = training_set, Vord = Vord, Word = Word)
+            else:
+                rom = self._pg_reductor.reduce(sigma, b, c, projection=projection)
             sigma, b, c = self._rom_to_sigma_b_c(rom, force_sigma_in_rhp)
             self._store_sigma_b_c(sigma, b, c)
             self._update_conv_data(sigma, rom, conv_crit)

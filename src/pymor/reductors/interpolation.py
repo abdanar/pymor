@@ -241,7 +241,7 @@ class LTIBHIReductor(GenericBHIReductor):
             assert type(Word) == int
             # compute projection matrices using POD
             [model_V, model_W] = matrixmodel(self.fom.A , self.fom.B, self.fom.C)
-            [pod_rom_V, pod_reductor_V, pod_rom_W, pod_reductor_W] = matrixreductor(model_V, model_W, training_set, Vord, Word)
+            [pod_rom_V, pod_rom_W, pod_reductor_V, pod_reductor_W] = matrixreductor(model_V, model_W, training_set, Vord, Word)
             [self.V, self.W] = pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, sigma, b, c)
         else:
             # compute projection matrices using rational Arnoldi process

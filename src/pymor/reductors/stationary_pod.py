@@ -1,4 +1,5 @@
 import numpy as np
+
 from pymor.vectorarrays.numpy import NumpyVectorSpace
 from pymor.reductors.basic import StationaryRBReductor
 
@@ -55,4 +56,4 @@ def matrixreductor(model_V, model_W, training_set, reduced_order_V, reduced_orde
     pod_rom_V = pod_reductor_V.reduce()
     pod_rom_W = pod_reductor_W.reduce()
 
-    return [pod_rom_V, pod_reductor_V, pod_rom_W, pod_reductor_W]
+    return [pod_rom_V, pod_rom_W, pod_reductor_V, pod_reductor_W]

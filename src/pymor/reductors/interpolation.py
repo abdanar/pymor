@@ -8,6 +8,7 @@ import numpy as np
 
 from pymor.algorithms.gram_schmidt import gram_schmidt, gram_schmidt_biorth
 from pymor.algorithms.krylov import rational_arnoldi
+from pymor.algorithms import pod_projection
 from pymor.core.base import BasicObject
 from pymor.models.iosys import LinearDelayModel, LTIModel, SecondOrderModel
 from pymor.models.transfer_function import TransferFunction
@@ -188,7 +189,7 @@ class LTIBHIReductor(GenericBHIReductor):
             )
         return self.fom
 
-    def reduce(self, sigma, b, c, projection='orth'):
+    def reduce(self, sigma, b, c, projection='orth', tranining_set = None, Vord = None, Word = None):
         """Bitangential Hermite interpolation.
 
         Parameters
@@ -212,13 +213,15 @@ class LTIBHIReductor(GenericBHIReductor):
             - `'arnoldi'`: projection matrices are orthogonalized using
               the rational Arnoldi process (available only for SISO
               systems).
+            - `'pod'`: projection matrices are obtained using POD
+                (available only for SISO systems).
 
         Returns
         -------
         rom
             Reduced-order model.
         """
-        if projection != 'arnoldi':
+        if projection != 'arnoldi' or 'pod':
             return super().reduce(sigma, b, c, projection=projection)
 
         assert self.fom.dim_input == 1
@@ -228,8 +231,16 @@ class LTIBHIReductor(GenericBHIReductor):
         assert c.shape == (r, self.fom.dim_output)
 
         # compute projection matrices
-        self.V = rational_arnoldi(self.fom.A, self.fom.E, self.fom.B, sigma)
-        self.W = rational_arnoldi(self.fom.A, self.fom.E, self.fom.C, sigma, trans=True)
+        if projection == 'pod':
+            assert type(tranining_set) == list
+            assert type(Vord) == int
+            assert type(Word) == int
+            # compute projection matrices using POD
+            [self.V, self.W]  = pod_projection(self.fom.A, self.fom.B, self.fom.C, sigma, b, c, tranining_set, Vord, Word)
+        else:
+            # compute projection matrices using rational Arnoldi process
+            self.V = rational_arnoldi(self.fom.A, self.fom.E, self.fom.B, sigma)
+            self.W = rational_arnoldi(self.fom.A, self.fom.E, self.fom.C, sigma, trans=True)
 
         # find reduced-order model
         self._pg_reductor = self._PGReductor(self._fom_assemble(), self.W, self.V)

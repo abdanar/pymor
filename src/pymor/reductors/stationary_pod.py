@@ -2,7 +2,7 @@ import numpy as np
 from pymor.vectorarrays.numpy import NumpyVectorSpace
 from pymor.reductors.basic import StationaryRBReductor
 
-def matrixreductor(model_V, model_W, training_set, reduced_order_V: int, reduced_order_W: int):
+def matrixreductor(model_V, model_W, training_set, reduced_order_V, reduced_order_W):
     
     '''
     Inputs:

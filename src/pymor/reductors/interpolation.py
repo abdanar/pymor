@@ -15,8 +15,8 @@ from pymor.parameters.base import Mu
 from pymor.reductors.basic import DelayLTIPGReductor, LTIPGReductor, ProjectionBasedReductor, SOLTIPGReductor
 
 # For POD based projection matrices
-from pymor.algorithms import pod_projection
-from pymor.models import matrix
+from pymor.algorithms.pod_projection import pod_projection
+from pymor.models.matrix import matrixmodel
 from pymor.reductors.stationary_pod import matrixreductor 
 
 
@@ -240,7 +240,7 @@ class LTIBHIReductor(GenericBHIReductor):
             assert type(Vord) == int
             assert type(Word) == int
             # compute projection matrices using POD
-            [model_V, model_W] = matrix(self.fom.A , self.fom.B, self.fom.C)
+            [model_V, model_W] = matrixmodel(self.fom.A , self.fom.B, self.fom.C)
             [pod_rom_V, pod_reductor_V, pod_rom_W, pod_reductor_W] = matrixreductor(model_V, model_W, training_set, Vord, Word)
             [self.V, self.W] = pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, sigma, b, c)
         else:

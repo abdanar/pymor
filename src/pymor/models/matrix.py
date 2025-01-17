@@ -6,7 +6,7 @@ from pymor.operators.numpy import NumpyMatrixOperator
 from pymor.operators.constructions import LincombOperator
 from pymor.parameters.functionals import ProjectionParameterFunctional, ConjugateParameterFunctional
 
-def MatrixModel(A, B, C):
+def matrixmodel(A, B, C):
 
     '''
     This function creates stationary models for the following linear coercive models derived for the given three matrices A, B, and C:

@@ -8,12 +8,16 @@ import numpy as np
 
 from pymor.algorithms.gram_schmidt import gram_schmidt, gram_schmidt_biorth
 from pymor.algorithms.krylov import rational_arnoldi
-from pymor.algorithms import pod_projection
 from pymor.core.base import BasicObject
 from pymor.models.iosys import LinearDelayModel, LTIModel, SecondOrderModel
 from pymor.models.transfer_function import TransferFunction
 from pymor.parameters.base import Mu
 from pymor.reductors.basic import DelayLTIPGReductor, LTIPGReductor, ProjectionBasedReductor, SOLTIPGReductor
+
+# For POD based projection matrices
+from pymor.algorithms import pod_projection
+from pymor.models import matrix
+from pymor.reductors.stationary_pod import matrixreductor 
 
 
 class GenericBHIReductor(BasicObject):
@@ -189,7 +193,7 @@ class LTIBHIReductor(GenericBHIReductor):
             )
         return self.fom
 
-    def reduce(self, sigma, b, c, projection='orth', tranining_set = None, Vord = None, Word = None):
+    def reduce(self, sigma, b, c, projection='orth', training_set = None, Vord = None, Word = None):
         """Bitangential Hermite interpolation.
 
         Parameters
@@ -232,11 +236,13 @@ class LTIBHIReductor(GenericBHIReductor):
 
         # compute projection matrices
         if projection == 'pod':
-            assert type(tranining_set) == list
+            assert type(training_set) == list
             assert type(Vord) == int
             assert type(Word) == int
             # compute projection matrices using POD
-            [self.V, self.W]  = pod_projection(self.fom.A, self.fom.B, self.fom.C, sigma, b, c, tranining_set, Vord, Word)
+            [model_V, model_W] = matrix(self.fom.A , self.fom.B, self.fom.C)
+            [pod_rom_V, pod_reductor_V, pod_rom_W, pod_reductor_W] = matrixreductor(model_V, model_W, training_set, Vord, Word)
+            [self.V, self.W] = pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, sigma, b, c)
         else:
             # compute projection matrices using rational Arnoldi process
             self.V = rational_arnoldi(self.fom.A, self.fom.E, self.fom.B, sigma)

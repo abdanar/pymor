@@ -225,7 +225,7 @@ class LTIBHIReductor(GenericBHIReductor):
         rom
             Reduced-order model.
         """
-        if projection != 'arnoldi' or 'pod':
+        if projection != 'arnoldi' or projection !='pod':
             return super().reduce(sigma, b, c, projection=projection)
 
         assert self.fom.dim_input == 1
@@ -236,9 +236,9 @@ class LTIBHIReductor(GenericBHIReductor):
 
         # compute projection matrices
         if projection == 'pod':
-            assert type(training_set) == list
-            assert type(Vord) == int
-            assert type(Word) == int
+            assert type(training_set) is list
+            assert type(Vord) is int
+            assert type(Word) is int
             # compute projection matrices using POD
             [model_V, model_W] = matrixmodel(self.fom.A , self.fom.B, self.fom.C)
             [pod_rom_V, pod_rom_W, pod_reductor_V, pod_reductor_W] = matrixreductor(model_V, model_W, training_set, Vord, Word)

@@ -43,12 +43,15 @@ class GenericIRKAReductor(BasicObject):
         self._conv_data = []
         self.errors = []
 
-    def __init__(self, fom, mu=None):
+    def __init__(self, fom, mu=None, training_set = None, Vord = None, Word = None):
         if not isinstance(mu, Mu):
             mu = fom.parameters.parse(mu)
         assert fom.parameters.assert_compatible(mu)
         self.fom = fom
         self.mu = mu
+        self.training_set = training_set
+        self.Vord = Vord
+        self.Word = Word
         self.V = None
         self.W = None
         self._pg_reductor = None
@@ -197,11 +200,11 @@ class IRKAReductor(GenericIRKAReductor):
         |Parameter values|.
     """
 
-    def __init__(self, fom, mu=None):
+    def __init__(self, fom, mu=None, training_set = None, Vord = None, Word = None):
         assert isinstance(fom, LTIModel)
-        super().__init__(fom, mu=mu)
+        super().__init__(fom, mu=mu, training_set = training_set, Vord = Vord, Word = Word)
 
-    def reduce(self, rom0_params, training_set = training_set, Vord = Vord, Word = Word, tol=1e-4, 
+    def reduce(self, rom0_params, training_set, Vord, Word, tol=1e-4, 
                maxit=100, num_prev=1, force_sigma_in_rhp=False, projection='orth', conv_crit='sigma', compute_errors=False):
         r"""Reduce using IRKA.
 
@@ -244,6 +247,8 @@ class IRKAReductor(GenericIRKAReductor):
               respect to the E product
             - `'arnoldi'`: projection matrices are orthogonalized using
               the Arnoldi process (available only for SISO systems).
+            - `'pod'`: projection matrices are obtained using POD
+              (available only for SISO systems).
         conv_crit
             Convergence criterion:
 
@@ -281,7 +286,7 @@ class IRKAReductor(GenericIRKAReductor):
         self._pg_reductor = LTIBHIReductor(self.fom, mu=self.mu)
         for it in range(maxit):
             if projection == 'pod':
-                rom = self._pg_reductor.reduce(sigma, b, c, projection=projection, training_set = training_set, Vord = Vord, Word = Word)
+                rom = self._pg_reductor.reduce(sigma, b, c, projection = projection, training_set = training_set, Vord = Vord, Word = Word)
             else:
                 rom = self._pg_reductor.reduce(sigma, b, c, projection=projection)
             sigma, b, c = self._rom_to_sigma_b_c(rom, force_sigma_in_rhp)

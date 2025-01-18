@@ -1,6 +1,6 @@
 import numpy as np
 
-from pymor.basic import *
+from pymor.algorithms.gram_schmidt import gram_schmidt_biorth
 from pymor.vectorarrays.numpy import NumpyVectorSpace
 
 def pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, mu, b, c):

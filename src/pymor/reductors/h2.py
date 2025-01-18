@@ -43,15 +43,12 @@ class GenericIRKAReductor(BasicObject):
         self._conv_data = []
         self.errors = []
 
-    def __init__(self, fom, mu=None, training_set = None, Vord = None, Word = None):
+    def __init__(self, fom, mu=None):
         if not isinstance(mu, Mu):
             mu = fom.parameters.parse(mu)
         assert fom.parameters.assert_compatible(mu)
         self.fom = fom
         self.mu = mu
-        self.training_set = training_set
-        self.Vord = Vord
-        self.Word = Word
         self.V = None
         self.W = None
         self._pg_reductor = None
@@ -200,11 +197,11 @@ class IRKAReductor(GenericIRKAReductor):
         |Parameter values|.
     """
 
-    def __init__(self, fom, mu=None, training_set = None, Vord = None, Word = None):
+    def __init__(self, fom, mu=None):
         assert isinstance(fom, LTIModel)
-        super().__init__(fom, mu=mu, training_set = training_set, Vord = Vord, Word = Word)
+        super().__init__(fom, mu=mu)
 
-    def reduce(self, rom0_params, training_set, Vord, Word, tol=1e-4, 
+    def reduce(self, rom0_params, training_set = None, Vord = None, Word = None, tol=1e-4, 
                maxit=100, num_prev=1, force_sigma_in_rhp=False, projection='orth', conv_crit='sigma', compute_errors=False):
         r"""Reduce using IRKA.
 

@@ -225,7 +225,7 @@ class LTIBHIReductor(GenericBHIReductor):
         rom
             Reduced-order model.
         """
-        if projection != 'arnoldi' or projection !='pod':
+        if projection != 'arnoldi' and projection !='pod':
             return super().reduce(sigma, b, c, projection=projection)
 
         assert self.fom.dim_input == 1

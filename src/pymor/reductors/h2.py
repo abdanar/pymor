@@ -284,6 +284,21 @@ class IRKAReductor(GenericIRKAReductor):
         for it in range(maxit):
             if projection == 'pod':
                 rom = self._pg_reductor.reduce(sigma, b, c, projection = projection, training_set = training_set, Vord = Vord, Word = Word)
+                # Get mu values as a NumPy array
+                mu_values = np.array([s['s'] for s in sigma])
+
+                # Construct a trianing set considering mu_min and m_max (in each iteration, set changes)
+                card_training_set = max(Vord, Word)
+                mu_values_real, mu_values_imaginary = mu_values.real, mu_values.imag
+                mu_min_real, mu_max_real = min(mu_values_real), max(mu_values_real)
+                mu_min_complex, mu_max_complex = min(mu_values_imaginary), max(mu_values_imaginary)
+                
+                random_real = np.random.uniform(low = mu_min_real, high = mu_max_real, size = card_training_set)
+                random_imaginary = 1j*np.random.uniform(low = mu_min_complex, high = mu_max_complex, size = card_training_set)
+                random_set = random_real + random_imaginary
+                training_set = []
+                for iter in range(card_training_set):
+                    training_set.append(Mu({'s': np.array(random_set[iter])}))
             else:
                 rom = self._pg_reductor.reduce(sigma, b, c, projection=projection)
             sigma, b, c = self._rom_to_sigma_b_c(rom, force_sigma_in_rhp)

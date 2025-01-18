@@ -265,8 +265,6 @@ class IRKAReductor(GenericIRKAReductor):
         rom
             Reduced |LTIModel| model.
         """
-
-        print('I was here')
         if self.fom.sampling_time > 0:
             raise NotImplementedError
 

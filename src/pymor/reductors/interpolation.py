@@ -242,7 +242,7 @@ class LTIBHIReductor(GenericBHIReductor):
             # compute projection matrices using POD
             [model_V, model_W] = matrixmodel(self.fom.A , self.fom.B, self.fom.C)
             [pod_rom_V, pod_rom_W, pod_reductor_V, pod_reductor_W] = matrixreductor(model_V, model_W, training_set, Vord, Word)
-            [self.V, self.W] = pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, sigma, b, c, orth = False)
+            [self.V, self.W] = pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, sigma, b, c, orth = True)
         else:
             # compute projection matrices using rational Arnoldi process
             self.V = rational_arnoldi(self.fom.A, self.fom.E, self.fom.B, sigma)

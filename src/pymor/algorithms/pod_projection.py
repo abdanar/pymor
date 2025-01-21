@@ -3,7 +3,7 @@ import numpy as np
 from pymor.algorithms.gram_schmidt import gram_schmidt_biorth
 from pymor.vectorarrays.numpy import NumpyVectorSpace
 
-def pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, mu, b, c):
+def pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, mu, b, c, orth = False):
 
     '''
     Inputs:
@@ -50,6 +50,9 @@ def pod_projection(pod_rom_V, pod_rom_W, pod_reductor_W, pod_reductor_V, mu, b, 
     space = NumpyVectorSpace(V_numpy.shape[0])
     V = space.make_array(V_numpy.T)
     W = space.make_array(W_numpy.T)
-    [V_bi, W_bi] = gram_schmidt_biorth(V, W) # NumpyVectorArray
 
-    return [V_bi, W_bi]  
+    if orth is True:
+        [V_bi, W_bi] = gram_schmidt_biorth(V, W) # NumpyVectorArray
+        [V, W] = [V_bi, W_bi]
+
+    return [V, W]

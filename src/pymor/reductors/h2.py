@@ -201,7 +201,7 @@ class IRKAReductor(GenericIRKAReductor):
         assert isinstance(fom, LTIModel)
         super().__init__(fom, mu=mu)
 
-    def reduce(self, rom0_params, training_set = None, Vord = None, Word = None, tol=1e-4, 
+    def reduce(self, rom0_params, Vord = None, Word = None, tol=1e-4, 
                maxit=100, num_prev=1, force_sigma_in_rhp=False, projection='orth', conv_crit='sigma', compute_errors=False):
         r"""Reduce using IRKA.
 
@@ -283,7 +283,6 @@ class IRKAReductor(GenericIRKAReductor):
         self._pg_reductor = LTIBHIReductor(self.fom, mu=self.mu)
         for it in range(maxit):
             if projection == 'pod':
-                rom = self._pg_reductor.reduce(sigma, b, c, projection = projection, training_set = training_set, Vord = Vord, Word = Word)
                 # Construct a trianing set considering mu_min and m_max (in each iteration, set changes)
                 card_training_set = max(Vord, Word)
                 mu_values_real, mu_values_imaginary = sigma.real, sigma.imag
@@ -295,6 +294,7 @@ class IRKAReductor(GenericIRKAReductor):
                 training_set = []
                 for iter in range(card_training_set):
                     training_set.append(Mu({'s': np.array(random_set[iter])}))
+                rom = self._pg_reductor.reduce(sigma, b, c, projection = projection, training_set = training_set, Vord = Vord, Word = Word)
                 self.logger.info(f'mu_min is {mu_min_real + 1j*mu_min_complex} and mu_max is {mu_max_real + 1j*mu_max_complex}')
             else:
                 rom = self._pg_reductor.reduce(sigma, b, c, projection=projection)
@@ -303,6 +303,7 @@ class IRKAReductor(GenericIRKAReductor):
             self._update_conv_data(sigma, rom, conv_crit)
             self._compute_conv_crit(rom, conv_crit, it)
             self._compute_error(rom, it, compute_errors)
+            self.logger.info(f'mu is {sigma}')
             if self.conv_crit[-1] < tol:
                 break
 
